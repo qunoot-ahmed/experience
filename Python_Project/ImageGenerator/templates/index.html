@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Image Generator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom style for better spacing and appearance */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .form-container button {
+            margin-top: 15px;
+            width: 100%;
+        }
+        .gallery-container {
+            margin-top: 30px;
+            position: relative;
+            height: 300px; /* Ensure the container has a fixed height */
+        }
+        .spinner-container {
+            display: none; /* Initially hidden */
+            justify-content: center;
+            align-items: center;
+            height: 100%; /* Fill the container */
+        }
+        .spinner-container.active {
+            display: flex;
+        }
+        .gallery-container .row {
+            display: flex;
+            justify-content: center; /* Center align images */
+        }
+        .gallery-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">OpenAI Image Generator</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Generate Cat Images <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Generate Dog Images</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Generate Panda Images</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    More
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+            </li>
+        </ul>
+
+        <!-- Search Form -->
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+
+<!-- Content -->
+<div class="container mt-5">
+    <div class="form-container">
+        <form id="generateForm">
+            <div class="form-group">
+                <h5><label for="imgprompt">Enter a prompt to generate an image:</label></h5>
+                <input id="imgprompt" type="text" class="form-control" name="prompt"
+                       placeholder="Enter your prompt here">
+            </div>
+            <div class="mt-3">
+                The image will be fetched from OpenAI
+            </div>
+            <button id="submitBtn" type="submit" class="btn btn-primary btn-block mt-3">
+                Submit
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Image Gallery Section -->
+<div class="container mt-5 gallery-container">
+    <div class="spinner-container" id="spinnerContainer">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <div class="row gallery" id="galleryContainer">
+        <!-- Images will be appended here -->
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    document.getElementById('generateForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const promptTxt = imgprompt.value;
+        const spinnerContainer = document.getElementById('spinnerContainer');
+        const galleryContainer = document.getElementById('galleryContainer');
+
+        // Show spinner
+        spinnerContainer.classList.add('active');
+
+        fetch("/generateimages/" + encodeURIComponent(promptTxt))
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            const imageUrls = data.image_urls;
+
+            // Clear previous images
+            galleryContainer.innerHTML = "";
+
+            // Build HTML for new images
+            let totalHtml = "";
+            imageUrls.forEach(url => {
+                const html = `<div class="col-md-12 d-flex justify-content-center my-2">
+                    <img src="${url}" class="img-responsive">
+                </div>`;
+                totalHtml += html;
+            });
+
+            // Append new images to the container
+            galleryContainer.innerHTML = totalHtml;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            // Hide spinner
+            spinnerContainer.classList.remove('active');
+        });
+    });
+</script>
+
+</body>
+</html>
