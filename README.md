@@ -4,4 +4,6 @@ This repository contains my academic and professional achievements as part of my
 
 - **Bachelor Final Report**: A comprehensive analysis of 'Sentiments Analysis on Urdu Text' completed as part of my bachelor's degree.
 - **Certificates**: Documentation of relevant qualifications.
-- **Python Project**: Dall-E Image Generator Using OpenAI.
+- **Python Projects**:
+  1. Dall-E Image Generator Using OpenAI.
+  2. Audio Transcription Service Using OpenAI Whisper.
